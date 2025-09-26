@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gera-Gere - Gestão Simplificada</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* ====================================
+           ESTILOS BASE E VARIÁVEIS (FINAL)
+           ==================================== */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --background-color: #f4f6f9;
+            --surface-color: #ffffff;
+            --text-color: #343a40;
+            --sidebar-color: #2c3e50;
+            --sidebar-text: #ecf0f1;
+            --border-color: #e2e6ea;
+            --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --font-size-base: 0.9em;
+        }
+
+        /* Dark Mode */
+        .dark-mode {
+            --primary-color: #74b9ff;
+            --secondary-color: #a4b0be;
+            --success-color: #4CAF50;
+            --danger-color: #ff6347;
+            --warning-color: #ffd700;
+            --info-color: #5bc0de;
+            --background-color: #1a1a2e;
+            --surface-color: #27273f;
+            --text-color: #f1f2f6;
+            --sidebar-color: #16162a;
+            --sidebar-text: #ffffff;
+            --border-color: #3f3f5a;
+            --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            min-height: 100vh;
+            font-size: var(--font-size-base);
+        }
+
+        /* ====================================
+           LAYOUT PRINCIPAL
+           ==================================== */
+        .sidebar {
+            width: 200px;
+            background-color: var(--sidebar-color);
+            color: var(--sidebar-text);
+            padding: 15px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            transition: width 0.3s;
+            z-index: 1000;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 0 15px 15px 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .sidebar-recolhida .logo {
+            font-size: 0;
+            padding: 0 10px 15px 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--sidebar-text);
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            font-size: 0.95em;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .nav-link i.material-icons {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .sidebar-recolhida .nav-link {
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .sidebar-recolhida .nav-link span {
+            display: none;
+        }
+
+        .main-content {
+            margin-left: 200px;
+            flex-grow: 1;
+            padding: 15px;
+            transition: margin-left 0.3s;
+        }
+
+        /* Estado Recolhido */
+        .sidebar-recolhida .sidebar {
+            width: 50px;
+        }
+
+        .sidebar-recolhida .main-content {
+            margin-left: 50px;
+        }
+
+        /* ====================================
+           HEADER
+           ==================================== */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            background-color: var(--surface-color);
+            box-shadow: var(--shadow-light);
+            border-radius: 6px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        #pageTitle {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-left: 15px;
+            color: var(--primary-color);
+        }
+
+        .btn-toggle {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            outline: none;
+            padding: 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .header-actions .material-icons {
+            font-size: 24px;
+        }
+
+        /* ====================================
+           PAGES E CARDS
+           ==================================== */
+        .page-content {
+            display: none;
+            padding: 0;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: var(--shadow-light);
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: var(--primary-color);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        /* ====================================
+           FORMULÁRIOS E INPUTS
+           ==================================== */
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            font-size: var(--font-size-base);
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .inline-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .inline-form .form-group {
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+
+        /* ====================================
+           BOTÕES
+           ==================================== */
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, opacity 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-secondary { background-color: var(--secondary-color); color: white; }
+        .btn-info { background-color: var(--info-color); color: white; }
+        .btn-success { background-color: var(--success-color); color: white; }
+        .btn-warning { background-color: var(--warning-color); color: var(--text-color);}
+
+        .btn:hover { opacity: 0.9; }
+
+        .btn i.material-icons {
+            font-size: 18px;
+        }
+
+        .btn-excluir {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 6px 12px;
+        }
+
+        /* Botões de Ação na Tabela/Lista */
+        .btn-note-action {
+            padding: 5px 8px;
+            font-size: 0.8em;
+        }
+
+        .btn-note-action i.material-icons {
+            font-size: 16px;
+        }
+
+        /* ====================================
+           TABELAS
+           ==================================== */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .data-table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background-color: var(--background-color);
+        }
+
+        .data-table tfoot td {
+            font-weight: bold;
+            background-color: var(--surface-color);
+            border-top: 2px solid var(--primary-color);
+        }
+
+        .alerta-estoque {
+            background-color: rgba(255, 193, 7, 0.2) !important;
+        }
+
+        /* ====================================
+           VALORES E MÉTRICAS
+           ==================================== */
+        .valor-positivo {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .valor-negativo {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .total-info {
+            font-size: 1em;
+            padding: 8px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+
+        .dashboard-metric {
+            padding: 15px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .metric-title {
+            font-size: 1em;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            margin-top: auto;
+        }
+
+        /* ====================================
+           TOAST E MODAIS
+           ==================================== */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 12px;
+            position: fixed;
+            z-index: 2000;
+            left: 50%;
+            bottom: 20px;
+            font-size: var(--font-size-base);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #toast.show {
+            visibility: visible;
+            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        #toast.success { background-color: var(--success-color); }
+        #toast.error { background-color: var(--danger-color); }
+        #toast.warning { background-color: var(--warning-color); color: var(--text-color);}
+        #toast.info { background-color: var(--info-color); }
+
+        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 20px; opacity: 1; } }
+        @keyframes fadeout { from { bottom: 20px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 40px;
+        }
+
+        .modal-content {
+            background-color: var(--surface-color);
+            margin: 3% auto;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .close-btn {
+            color: var(--secondary-color);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* ====================================
+           LOGIN OVERLAY
+           ==================================== */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .login-box {
+            background-color: var(--surface-color);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .login-box h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        /* ====================================
+           POST-IT DIGITAL (REFORÇADO)
+           ==================================== */
+        #stickyNote {
+            position: fixed;
+            top: 80px; /* Abaixo do cabeçalho */
+            right: 15px;
+            width: 250px; 
+            height: 250px;
+            background-color: #fff9c4; /* Amarelo clarinho */
+            border: 1px solid #ffeb3b;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 5000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+
+        #noteHeader {
+            background-color: #ffccbc; /* Salmão clarinho */
+            color: var(--text-color);
+            padding: 8px 10px;
+            font-weight: bold;
+            font-size: 0.95em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        #noteHeader button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        #noteContent {
+            flex-grow: 1;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            resize: none;
+            font-family: inherit;
+            font-size: 0.9em;
+            box-sizing: border-box;
+            background-color: inherit;
+            color: var(--text-color);
+        }
+
+        #showNoteButton {
+            position: fixed;
+            bottom: 15px;
+            right: 15px; /* Posição padrão */
+            background-color: var(--warning-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            z-index: 5000;
+            transition: transform 0.2s;
+        }
+
+        #showNoteButton:hover {
+            transform: scale(1.05);
+        }
+
+
+        /* ====================================
+           LISTAS (AGENDA)
+           ==================================== */
+        ul#listaCompromissos, ul#listaCompromissosDashboard {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul#listaCompromissos li {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        ul#listaCompromissosDashboard li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        ul#listaCompromissos li:hover {
+            background-color: var(--background-color);
+        }
+
+        ul#listaCompromissos li.concluido {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        /* ====================================
+           RESPONSIVIDADE (MOBILE)
+           ==================================== */
+        @media (max-width: 768px) {
+            /* Força o modo recolhido no mobile */
+            .sidebar {
+                width: 50px;
+                padding-top: 10px;
+            }
+
+            .main-content {
+                margin-left: 50px;
+                padding: 10px;
+            }
+
+            .logo, .nav-link span {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 12px 5px;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            #pageTitle {
+                font-size: 1.3em;
+                margin-left: 10px;
+            }
+
+            .card-grid {
+                /* Garante que o dashboard de 4 colunas se adapte */
+                grid-template-columns: 1fr !important;
+            }
+
+            .inline-form {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .inline-form .form-group {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .login-box {
+                max-width: 300px;
+            }
+
+            /* Posição do Post-it no Mobile */
+            #stickyNote {
+                top: auto;
+                bottom: 70px; /* Acima do botão */
+                left: 10px;
+                right: 10px;
+                width: auto; /* Ocupa toda a largura disponível */
+                max-height: 50vh; /* Limita a altura para não cobrir a tela inteira */
+            }
+
+            #showNoteButton {
+                bottom: 15px;
+                right: 15px;
+                left: auto;
+            }
+        }
+    </style>
+</head>
+<body class="sidebar-recolhida">
+
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h1>Gera-Gere</h1>
+            <p id="configSenhaInicial" style="display: none; color: var(--danger-color); font-weight: bold; margin-bottom: 20px;">
+                PRIMEIRO ACESSO: Digite sua Senha Mestra para configurar.
+            </p>
+            <div class="form-group">
+                <input type="password" id="inputSenhaMestra" placeholder="Senha Mestra" required>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="salvarSenhaCheckbox" checked>
+                <label for="salvarSenhaCheckbox">Lembrar Senha</label>
+            </div>
+            <button class="btn btn-primary" onclick="acessarSistema()">
+                <i class="material-icons">lock_open</i> Acessar Sistema
+            </button>
+        </div>
+    </div>
+
+
+    <div class="sidebar">
+        <div class="logo">Gera-Gere</div>
+        <nav>
+            <a class="nav-link" onclick="mudarPagina('paginaDashboard')">
+                <i class="material-icons">dashboard</i> <span>Dashboard</span>
+            </a>
+            <a class="nav-link" onclick="mudarPagina('paginaEstoque')">
+                <i class="material-icons">inventory</i> <span>Estoque / CMP</span>
+            </a>
+            <a class="nav-link" onclick="mudarPagina('paginaHistoricoVendas')">
+                <i class="material-icons">paid</i> <span>Histórico de Vendas</span>
+            </a>
+            <a class="nav-link" onclick="mudarPagina('paginaCalculadora')">
+                <i class="material-icons">calculate</i> <span>Calculadora (Reversa)</span>
+            </a>
+            <a class="nav-link" onclick="mudarPagina('paginaClientes')">
+                <i class="material-icons">group</i> <span>CRM Clientes</span>
+            </a>
+            <a class="nav-link" onclick="mudarPagina('paginaAgenda')">
+                <i class="material-icons">event</i> <span>Agenda / Lembretes</span>
+            </a>
+            <a class="nav-link" onclick="mudarPagina('paginaFluxoCaixa')">
+                <i class="material-icons">account_balance_wallet</i> <span>Fluxo de Caixa</span>
+            </a>
+            <a class="nav-link" onclick="mudarPagina('paginaConfiguracoes')">
+                <i class="material-icons">settings</i> <span>Configurações</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="header-left">
+                <button class="btn-toggle" onclick="toggleSidebar()">
+                    <i class="material-icons">menu</i>
+                </button>
+                <h1 id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="header-actions">
+                <button id="themeToggle" class="btn-toggle" onclick="toggleDarkMode(true)">
+                    <i class="material-icons">dark_mode</i>
+                </button>
+            </div>
+        </header>
+
+        <div id="paginaDashboard" class="page-content" style="display: block;">
+
+            <h2>Resumo Financeiro e Operacional</h2>
+            <p style="font-size: 0.9em; color: var(--secondary-color); margin-top: -10px;">Métricas consolidadas do seu negócio.</p>
+
+            <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+
+                <div class="card dashboard-metric" style="border-left: 4px solid var(--success-color);">
+                    <div class="metric-title">Lucro Bruto (Estimado)</div>
+                    <div id="dashboardLucroTotal" class="metric-value valor-positivo">R$ 0,00</div>
+                    <small>Histórico de Vendas</small>
+                </div>
+
+                <div class="card dashboard-metric" style="border-left: 4px solid var(--primary-color);">
+                    <div class="metric-title">Saldo Atual de Caixa</div>
+                    <div id="dashboardSaldoCaixa" class="metric-value">R$ 0,00</div>
+                    <small>Fluxo de Caixa Consolidado</small>
+                </div>
+
+                <div class="card dashboard-metric" style="border-left: 4px solid var(--danger-color);">
+                    <div class="metric-title">Produtos em Alerta de Estoque</div>
+                    <div id="dashboardAlertaEstoque" class="metric-value">0</div>
+                    <small>Abaixo do Estoque Mínimo</small>
+                </div>
+
+                <div class="card dashboard-metric" style="border-left: 4px solid var(--info-color);">
+                    <div class="metric-title">Clientes Cadastrados</div>
+                    <div id="dashboardTotalClientes" class="metric-value">0</div>
+                    <small>Total no CRM</small>
+                </div>
+
+            </div>
+
+            <div class="card-grid" style="grid-template-columns: 1fr 1fr;">
+
+                <div class="card">
+                    <h2>Ações Imediatas</h2>
+                    <p style="font-size: 0.8em; color: var(--secondary-color); margin-top: -10px;">Links diretos para os cadastros e lançamentos mais comuns.</p>
+                    <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+                        <button class="btn btn-primary" onclick="mudarPagina('paginaFluxoCaixa')">
+                            <i class="material-icons">add_circle</i> Novo Lançamento
+                        </button>
+                        <button class="btn btn-success" onclick="mudarPagina('paginaHistoricoVendas')">
+                            <i class="material-icons">shopping_cart</i> Nova Venda
+                        </button>
+                        <button class="btn btn-info" onclick="mudarPagina('paginaEstoque')">
+                            <i class="material-icons">add_box</i> Entrada no Estoque
+                        </button>
+                        <button class="btn btn-warning" onclick="mudarPagina('paginaAgenda')">
+                            <i class="material-icons">event_note</i> Novo Lembrete
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" style="border-bottom: none;">
+                        <h2>Compromissos Pendentes Hoje</h2>
+                        <button class="btn btn-secondary btn-note-action" onclick="mudarPagina('paginaAgenda')">
+                            <i class="material-icons">edit</i> Ver Agenda Completa
+                        </button>
+                    </div>
+
+                    <ul id="listaCompromissosDashboard" class="list-group" style="margin-top: -10px;">
+                        </ul>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="paginaEstoque" class="page-content">
+            <div class="card-grid">
+                <div class="card">
+                    <h2>Novo Produto</h2>
+                    <div class="form-group">
+                        <label for="nomeProduto">Nome do Produto:</label>
+                        <input type="text" id="nomeProduto" required>
+                    </div>
+                    <div class="inline-form">
+                        <div class="form-group">
+                            <label for="skuProduto">SKU / Código:</label>
+                            <input type="text" id="skuProduto" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="estoqueMinimo">Estoque Mínimo:</label>
+                            <input type="number" id="estoqueMinimo" value="5" min="0" required>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="adicionarProduto()"><i class="material-icons">save</i> Cadastrar Produto</button>
+                </div>
+
+                <div class="card">
+                    <h2>Registrar Movimentação</h2>
+                    <div class="form-group">
+                        <label for="movProduto">Produto:</label>
+                        <select id="movProduto" required>
+                            <option value="">-- Selecione um produto --</option>
+                        </select>
+                    </div>
+                    <div class="inline-form">
+                        <div class="form-group w-auto">
+                            <label for="tipoMovimento">Tipo:</label>
+                            <select id="tipoMovimento" required onchange="toggleMovimentacaoFields()">
+                                <option value="entrada">ENTRADA (Compra)</option>
+                                <option value="saida">SAÍDA (Venda)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="movQuantidade">Quantidade:</label>
+                            <input type="number" id="movQuantidade" value="1" min="1" required>
+                        </div>
+                    </div>
+                    <div class="inline-form">
+                        <div class="form-group" id="containerMovCusto">
+                            <label for="movCustoUnitario">Custo Total da Movimentação (Para CMP):</label>
+                            <input type="number" id="movCustoUnitario" value="0.00" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group" id="containerMovCliente" style="display: none;">
+                        <label for="movCliente">Cliente (Opcional):</label>
+                        <select id="movCliente">
+                             <option value="">-- Cliente não informado --</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="registrarMovimentacao()"><i class="material-icons">receipt_long</i> Registrar</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Controle de Estoque e CMP</h2>
+                    <div class="inline-form">
+                        <div class="form-group w-auto" style="margin-right: 10px;">
+                            <input type="text" id="buscaEstoque" placeholder="Buscar por SKU ou Nome" onkeyup="filtrarTabela('tabelaEstoque', 'buscaEstoque')">
+                        </div>
+                        <button class="btn btn-info" onclick="imprimirTabela('tabelaEstoque', 'Estoque e CMP')">
+                            <i class="material-icons">print</i> Imprimir/Exportar
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="tabelaEstoque" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>SKU/CÓDIGO</th>
+                                <th>NOME</th>
+                                <th style="text-align: center;">ESTOQUE ATUAL</th>
+                                <th style="text-align: center;">ESTOQUE MÍNIMO</th>
+                                <th>CUSTO UNITÁRIO (CMP)</th>
+                                <th style="text-align: center;">AÇÕES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="paginaHistoricoVendas" class="page-content">
+             <div class="card">
+                <div class="card-header">
+                    <h2>Histórico de Vendas (Saídas do Estoque)</h2>
+                    <div class="inline-form">
+                        <div class="form-group w-auto" style="margin-right: 10px;">
+                            <input type="text" id="buscaVendas" placeholder="Buscar por Produto ou Cliente" onkeyup="filtrarTabela('tabelaHistoricoVendas', 'buscaVendas')">
+                        </div>
+                        <button class="btn btn-info" onclick="imprimirTabela('tabelaHistoricoVendas', 'Histórico de Vendas')">
+                            <i class="material-icons">print</i> Imprimir/Exportar
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="tabelaHistoricoVendas" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>DATA</th>
+                                <th>PRODUTO</th>
+                                <th>CLIENTE</th>
+                                <th style="text-align: center;">QTD</th>
+                                <th>VALOR VENDA</th>
+                                <th>CUSTO TOTAL</th>
+                                <th>LUCRO BRUTO</th>
+                                <th style="text-align: center;">AÇÕES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" style="text-align: right;">TOTAIS:</td>
+                                <td id="totalVenda">R$ 0,00</td>
+                                <td id="totalCusto">R$ 0,00</td>
+                                <td id="totalLucro">R$ 0,00</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="paginaCalculadora" class="page-content">
+            <div class="card-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="card">
+                    <h2>Entradas do Cálculo</h2>
+                    <p style="font-size: 0.9em; color: var(--secondary-color);">Calcule o **lucro estimado** a partir de um preço de venda fixo, considerando todos os custos.</p>
+
+                    <div class="form-group">
+                        <label for="precoVendaDesejado">Preço de Venda Desejado (Total):</label>
+                        <input type="number" id="precoVendaDesejado" value="100.00" step="0.01" min="0" required oninput="calcularVendaReversa()">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="selectPlataforma">Plataforma/Canal de Venda:</label>
+                        <select id="selectPlataforma" onchange="calcularVendaReversa()">
+                            </select>
+                    </div>
+
+                    <div class="inline-form">
+                        <div class="form-group">
+                            <label for="impostoPercentual">Imposto sobre Venda (%):</label>
+                            <input type="number" id="impostoPercentual" value="0" min="0" max="100" step="0.01" oninput="calcularVendaReversa()">
+                        </div>
+                        <div class="form-group">
+                            <label for="taxaFixaRS">Taxa Fixa (R$):</label>
+                            <input type="number" id="taxaFixaRS" value="0.00" min="0" step="0.01" oninput="calcularVendaReversa()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="despesaDiversa">Despesa Extra / Frete Próprio (R$):</label>
+                        <input type="number" id="despesaDiversa" value="0.00" min="0" step="0.01" oninput="calcularVendaReversa()">
+                    </div>
+
+                    <hr style="margin: 20px 0;">
+                    <h3>Dados do Produto</h3>
+                    <div class="inline-form">
+                        <div class="form-group">
+                            <label for="quantidadeItens">Qtd. de Itens (para Kits):</label>
+                            <input type="number" id="quantidadeItens" value="1" min="1" oninput="calcularVendaReversa()">
+                        </div>
+                        <div class="form-group">
+                            <label for="custoUnitarioItem">Custo Unitário (CMP/Fornecedor):</label>
+                            <input type="number" id="custoUnitarioItem" value="10.00" min="0" step="0.01" oninput="calcularVendaReversa()">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card" id="resultadosCalculadora">
+                    <h2>Resultados da Venda</h2>
+                    <p style="font-size: 0.9em; color: var(--secondary-color);">Estimativa de Receita e Lucro.</p>
+
+                    <div class="total-info" style="border-top: none;">
+                        <span>RECEITA BRUTA (Venda):</span>
+                        <span id="resPrecoVenda">R$ 0,00</span>
+                    </div>
+
+                    <div class="total-info" style="font-weight: normal; font-size: 1em; color: var(--danger-color); border-top: 1px dashed var(--border-color);">
+                        <span>Custo Bruto do(s) Produto(s):</span>
+                        <span id="resCustoBrutoProduto">R$ 0,00</span>
+                    </div>
+                    <div class="total-info" style="font-weight: normal; font-size: 1em; color: var(--danger-color);">
+                        <span>Taxa Fixa (R$):</span>
+                        <span id="resTaxaFixaRS">R$ 0,00</span>
+                    </div>
+                    <div class="total-info" style="font-weight: normal; font-size: 1em; color: var(--danger-color);">
+                        <span>Taxa da Plataforma (%):</span>
+                        <span id="resTaxaPlat">R$ 0,00</span>
+                    </div>
+                    <div class="total-info" style="font-weight: normal; font-size: 1em; color: var(--danger-color);">
+                        <span>Imposto sobre Venda (R$):</span>
+                        <span id="resImpostoRS">R$ 0,00</span>
+                    </div>
+                    <div class="total-info" style="font-weight: normal; font-size: 1em; color: var(--danger-color);">
+                        <span>Despesa Extra (R$):</span>
+                        <span id="resDespesaDiversa">R$ 0,00</span>
+                    </div>
+
+                    <div class="total-info" style="border-top: 2px solid var(--border-color); margin-top: 20px; color: var(--secondary-color);">
+                        <span>RENDIMENTO LÍQUIDO:</span>
+                        <span id="resRendaLiquida">R$ 0,00</span>
+                    </div>
+
+                    <div class="total-info" style="font-size: 1.5em; border-top: 2px solid var(--primary-color);">
+                        <span>LUCRO FINAL ESTIMADO:</span>
+                        <span id="resLucroFinal" class="valor-positivo">R$ 0,00</span>
+                    </div>
+
+                    <button class="btn btn-info" onclick="imprimirResultadosCalculadora()" style="margin-top: 20px;">
+                        <i class="material-icons">print</i> Imprimir Relatório
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="paginaClientes" class="page-content">
+            <div id="listaClientesView">
+                <div class="card-grid" style="grid-template-columns: 1fr 2fr;">
+                    <div class="card">
+                        <h2>Novo Cliente</h2>
+                        <div class="form-group">
+                            <label for="nomeCliente">Nome Completo:</label>
+                            <input type="text" id="nomeCliente" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefoneCliente">Telefone / WhatsApp:</label>
+                            <input type="text" id="telefoneCliente" placeholder="(XX) XXXXX-XXXX" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailCliente">Email:</label>
+                            <input type="email" id="emailCliente">
+                        </div>
+                        <div class="inline-form">
+                            <div class="form-group">
+                                <label for="cpfCnpjCliente">CPF/CNPJ (Opcional):</label>
+                                <input type="text" id="cpfCnpjCliente">
+                            </div>
+                            <div class="form-group">
+                                <label for="nascimentoCliente">Data de Nasc.:</label>
+                                <input type="date" id="nascimentoCliente">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="origemCliente">Origem do Cliente:</label>
+                            <select id="origemCliente">
+                                <option value="direto">Venda Direta</option>
+                                <option value="shopee">Shopee</option>
+                                <option value="mercadolivre">Mercado Livre</option>
+                                <option value="instagram">Instagram/Redes</option>
+                                <option value="outra">Outra</option>
+                            </select>
+                        </div>
+                        <hr style="margin: 20px 0;">
+                        <h3>Endereço (Opcional)</h3>
+                        <div class="form-group">
+                            <label for="cepCliente">CEP:</label>
+                            <input type="text" id="cepCliente" maxlength="9" onkeyup="preencherEnderecoPeloCep('cepCliente', 'enderecoCliente', 'bairroCliente', 'cidadeCliente', 'estadoCliente')" placeholder="Ex: 00000-000">
+                        </div>
+                        <div class="inline-form">
+                            <div class="form-group w-50">
+                                <label for="enderecoCliente">Rua/Logradouro:</label>
+                                <input type="text" id="enderecoCliente">
+                            </div>
+                            <div class="form-group w-auto" style="width: 30%;">
+                                <label for="numeroCliente">Número:</label>
+                                <input type="text" id="numeroCliente">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="bairroCliente">Bairro:</label>
+                            <input type="text" id="bairroCliente">
+                        </div>
+                        <div class="inline-form">
+                            <div class="form-group w-50">
+                                <label for="cidadeCliente">Cidade:</label>
+                                <input type="text" id="cidadeCliente">
+                            </div>
+                            <div class="form-group w-50">
+                                <label for="estadoCliente">Estado (UF):</label>
+                                <input type="text" id="estadoCliente" maxlength="2">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="observacoesCliente">Observações:</label>
+                            <textarea id="observacoesCliente" rows="3"></textarea>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="adicionarCliente()"><i class="material-icons">person_add</i> Cadastrar Cliente</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Lista de Clientes (Total: <span id="dashboardTotalClientes">0</span>)</h2>
+                            <div class="inline-form">
+                                <div class="form-group w-auto">
+                                    <input type="text" id="buscaClientes" placeholder="Buscar por Nome, Tel, Email" onkeyup="filtrarTabela('tabelaClientes', 'buscaClientes')">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="tabelaClientes" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>NOME</th>
+                                        <th>TELEFONE</th>
+                                        <th>EMAIL</th>
+                                        <th>ORIGEM</th>
+                                        <th style="text-align: center;">AÇÕES</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="detalhesCliente" class="card" style="display: none;">
+                <div class="card-header">
+                    <h2 id="detalhesClienteNome">Detalhes do Cliente</h2>
+                    <button class="btn btn-secondary" onclick="fecharDetalhesCliente()">
+                        <i class="material-icons">arrow_back</i> Voltar à Lista
+                    </button>
+                </div>
+
+                <div class="card-grid" style="grid-template-columns: 1fr 2fr;">
+                    <div class="card" style="padding: 15px;">
+                        <h3>Informações Gerais</h3>
+                        <div id="infoGeralCliente">
+                            </div>
+                        <div class="total-info" style="font-size: 1.1em; border-top: 1px solid var(--border-color); margin-top: 15px;">
+                            <span>Total Gasto:</span>
+                            <span id="totalGastoCliente" class="valor-positivo">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <div class="card" style="padding: 15px;">
+                        <h3>Histórico de Compras Registradas</h3>
+                        <div class="table-responsive">
+                            <table id="tabelaHistoricoCliente" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>DATA</th>
+                                        <th>PRODUTO</th>
+                                        <th style="text-align: center;">QTD</th>
+                                        <th>VALOR VENDA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="paginaAgenda" class="page-content">
+            <div class="card-grid" style="grid-template-columns: 1fr 2fr;">
+                <div class="card">
+                    <h2>Novo Compromisso/Lembrete</h2>
+                    <div class="form-group">
+                        <label for="tituloCompromisso">Título/Assunto:</label>
+                        <input type="text" id="tituloCompromisso" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataCompromisso">Data:</label>
+                        <input type="date" id="dataCompromisso" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="horaCompromisso">Hora (Opcional):</label>
+                        <input type="time" id="horaCompromisso">
+                    </div>
+                    <button class="btn btn-primary" onclick="adicionarCompromisso()">
+                        <i class="material-icons">event</i> Salvar Compromisso
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Compromissos Pendentes</h2>
+                        <div class="form-group w-auto" style="margin-bottom: 0;">
+                            <label for="filtroAgenda" style="display: none;">Filtrar:</label>
+                            <select id="filtroAgenda" onchange="carregarCompromissos()">
+                                <option value="hoje">Somente Hoje</option>
+                                <option value="semana">Próxima Semana</option>
+                                <option value="mes">Próximo Mês</option>
+                                <option value="pendentes" selected>Todos Pendentes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <ul id="listaCompromissos">
+                        </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="paginaFluxoCaixa" class="page-content">
+            <div class="card-grid" style="grid-template-columns: 1fr 2fr;">
+
+                <div class="card">
+                    <h2>Novo Lançamento</h2>
+                    <p style="font-size: 0.9em; color: var(--secondary-color);">Registre receitas (entradas) e despesas (saídas).</p>
+
+                    <div class="form-group">
+                        <label for="tipoLancamento">Tipo de Movimento:</label>
+                        <select id="tipoLancamento" required>
+                            <option value="receita">Receita (Entrada)</option>
+                            <option value="despesa">Despesa (Saída)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descricaoLancamento">Descrição / Motivo:</label>
+                        <input type="text" id="descricaoLancamento" placeholder="Ex: Pagamento de Fornecedor, Venda Extra" required>
+                    </div>
+
+                    <div class="inline-form">
+                        <div class="form-group">
+                            <label for="dataLancamento">Data:</label>
+                            <input type="date" id="dataLancamento" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="valorLancamento">Valor (R$):</label>
+                            <input type="number" id="valorLancamento" value="0.00" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoriaLancamento">Categoria:</label>
+                        <select id="categoriaLancamento">
+                            <option value="vendas">Vendas (Padrão)</option>
+                            <option value="servicos">Serviços</option>
+                            <option value="salarios">Salários/Pró-Labore</option>
+                            <option value="compras">Compras/Estoque</option>
+                            <option value="impostos">Impostos/Taxas</option>
+                            <option value="fretes">Fretes/Logística</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="adicionarLancamento()">
+                        <i class="material-icons">add_circle</i> Lançar Movimento
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Métricas de Caixa</h2>
+                        <div class="inline-form">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="filtroMesFluxo" style="font-size: 0.8em;">Filtrar por Mês:</label>
+                                <input type="month" id="filtroMesFluxo" onchange="carregarFluxoCaixa()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 15px;">
+                        <div class="dashboard-metric" style="border-left: 4px solid var(--success-color);">
+                            <div class="metric-title">Receitas (Entradas)</div>
+                            <div id="totalReceitas" class="metric-value valor-positivo">R$ 0,00</div>
+                        </div>
+                        <div class="dashboard-metric" style="border-left: 4px solid var(--danger-color);">
+                            <div class="metric-title">Despesas (Saídas)</div>
+                            <div id="totalDespesas" class="metric-value valor-negativo">R$ 0,00</div>
+                        </div>
+                        <div class="dashboard-metric" style="border-left: 4px solid var(--primary-color);">
+                            <div class="metric-title">SALDO FINAL</div>
+                            <div id="saldoCaixa" class="metric-value">R$ 0,00</div>
+                        </div>
+                    </div>
+
+                    <h2 style="margin-top: 20px;">Histórico de Lançamentos</h2>
+                    <div class="table-responsive">
+                        <table id="tabelaFluxoCaixa" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%;">DATA</th>
+                                    <th>DESCRIÇÃO</th>
+                                    <th style="width: 15%;">TIPO</th>
+                                    <th style="width: 20%; text-align: right;">VALOR</th>
+                                    <th style="width: 5%; text-align: center;">AÇÕES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="paginaConfiguracoes" class="page-content">
+            <div class="card">
+                <h2>Status da Licença (MODIFICADO)</h2>
+                <p>O sistema foi modificado para operar em modo **desbloqueado permanente**. A checagem de licença foi desativada no código.</p>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label for="inputSerial">Serial de Ativação:</label>
+                        <input type="text" id="inputSerial" placeholder="Sistema Desbloqueado Permanentemente." disabled>
+                    </div>
+                    <div class="form-group w-auto">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-secondary" disabled>Ativar</button>
+                    </div>
+                </div>
+                <p>Status Atual: <strong id="statusLicenca" class="valor-positivo">ATIVA (Desbloqueada)</strong></p>
+                <p>Validade: <span id="validadeLicenca">Permanente</span></p>
+            </div>
+
+            <div class="card-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="card">
+                    <h2>Plataformas e Taxas de Venda</h2>
+                    <p style="font-size: 0.9em; color: var(--secondary-color);">Configure as taxas percentuais de suas plataformas (Marketplaces).</p>
+                    <div class="form-group">
+                        <label for="nomePlataforma">Nome da Plataforma (Ex: Shopee, Mercado Livre):</label>
+                        <input type="text" id="nomePlataforma">
+                    </div>
+                    <div class="form-group">
+                        <label for="taxaPlataforma">Taxa Percentual da Plataforma (%):</label>
+                        <input type="number" id="taxaPlataforma" value="0.00" min="0" max="99" step="0.01">
+                    </div>
+                    <button class="btn btn-primary" onclick="adicionarPlataforma()">
+                        <i class="material-icons">add</i> Adicionar Plataforma
+                    </button>
+
+                    <hr style="margin: 20px 0;">
+
+                    <div class="table-responsive">
+                        <table id="tabelaPlataformas" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Taxa (%)</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Outras Configurações</h2>
+                    <div class="form-group">
+                        <label for="margemLucroPadraoConfig">Margem de Lucro Padrão (%):</label>
+                        <input type="number" id="margemLucroPadraoConfig" value="30" min="0" max="100" step="0.01">
+                        <small>Atualmente não utilizada no cálculo reverso, mas salva como padrão.</small>
+                    </div>
+                    <button class="btn btn-secondary" onclick="saveConfigCalculadora()">
+                        <i class="material-icons">save</i> Salvar Configurações de Cálculo
+                    </button>
+
+                    <hr style="margin: 20px 0;">
+
+                    <h3>Opções de UI</h3>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="darkModeToggle" onclick="toggleDarkMode(true)">
+                        <label for="darkModeToggle">Modo Escuro (Dark Mode)</label>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-excluir" onclick="localStorage.clear(); window.location.reload();">
+                            <i class="material-icons">cleaning_services</i> Limpar Todos os Dados e Configurações
+                        </button>
+                        <small style="display: block; color: var(--danger-color); margin-top: 5px;">Atenção: Irá apagar todos os produtos, clientes e histórico de vendas.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="modalEditarProduto" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Produto</h2>
+                <span class="close-btn" onclick="fecharModalEditarProduto()">&times;</span>
+            </div>
+            <input type="hidden" id="editProdutoSkuAtual">
+            <div class="form-group">
+                <label for="editNomeProduto">Nome do Produto:</label>
+                <input type="text" id="editNomeProduto" required>
+            </div>
+            <div class="form-group">
+                <label for="editSkuProduto">SKU / Código:</label>
+                <input type="text" id="editSkuProduto" required>
+            </div>
+            <div class="form-group">
+                <label for="editEstoqueMinimo">Estoque Mínimo:</label>
+                <input type="number" id="editEstoqueMinimo" min="0" required>
+            </div>
+            <p>Custo Unitário (CMP Atual): <strong id="editCustoUnitario">R$ 0,00</strong></p>
+            <button class="btn btn-primary" onclick="salvarEdicaoProduto()">
+                <i class="material-icons">save</i> Salvar Alterações
+            </button>
+        </div>
+    </div>
+
+    <div id="modalEditarCliente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Cliente</h2>
+                <span class="close-btn" onclick="fecharModalEditarCliente()">&times;</span>
+            </div>
+            <input type="hidden" id="editClienteId">
+            <div class="form-group">
+                <label for="editNomeCliente">Nome Completo:</label>
+                <input type="text" id="editNomeCliente" required>
+            </div>
+            <div class="form-group">
+                <label for="editTelefoneCliente">Telefone / WhatsApp:</label>
+                <input type="text" id="editTelefoneCliente" required>
+            </div>
+            <div class="form-group">
+                <label for="editEmailCliente">Email:</label>
+                <input type="email" id="editEmailCliente">
+            </div>
+            <div class="inline-form">
+                <div class="form-group">
+                    <label for="editCpfCnpjCliente">CPF/CNPJ (Opcional):</label>
+                    <input type="text" id="editCpfCnpjCliente">
+                </div>
+                <div class="form-group">
+                    <label for="editNascimentoCliente">Data de Nasc.:</label>
+                    <input type="date" id="editNascimentoCliente">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="editOrigemCliente">Origem do Cliente:</label>
+                <select id="editOrigemCliente">
+                    <option value="direto">Venda Direta</option>
+                    <option value="shopee">Shopee</option>
+                    <option value="mercadolivre">Mercado Livre</option>
+                    <option value="instagram">Instagram/Redes</option>
+                    <option value="outra">Outra</option>
+                </select>
+            </div>
+            <hr>
+            <h3>Endereço</h3>
+            <div class="form-group">
+                <label for="editCepCliente">CEP:</label>
+                <input type="text" id="editCepCliente" maxlength="9" onkeyup="preencherEnderecoPeloCep('editCepCliente', 'editEnderecoCliente', 'editBairroCliente', 'editCidadeCliente', 'editEstadoCliente')" placeholder="Ex: 00000-000">
+            </div>
+            <div class="inline-form">
+                <div class="form-group w-50">
+                    <label for="editEnderecoCliente">Rua/Logradouro:</label>
+                    <input type="text" id="editEnderecoCliente">
+                </div>
+                <div class="form-group w-auto" style="width: 30%;">
+                    <label for="editNumeroCliente">Número:</label>
+                    <input type="text" id="editNumeroCliente">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="editBairroCliente">Bairro:</label>
+                <input type="text" id="editBairroCliente">
+            </div>
+            <div class="inline-form">
+                <div class="form-group w-50">
+                    <label for="editCidadeCliente">Cidade:</label>
+                    <input type="text" id="editCidadeCliente">
+                </div>
+                <div class="form-group w-50">
+                    <label for="editEstadoCliente">Estado (UF):</label>
+                    <input type="text" id="editEstadoCliente" maxlength="2">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="editObservacoesCliente">Observações:</label>
+                <textarea id="editObservacoesCliente" rows="3"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="salvarEdicaoCliente()">
+                <i class="material-icons">save</i> Salvar Alterações
+            </button>
+        </div>
+    </div>
+
+    <div id="modalEditarPlataforma" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Plataforma</h2>
+                <span class="close-btn" onclick="fecharModalEditarPlataforma()">&times;</span>
+            </div>
+            <input type="hidden" id="editPlataformaId">
+            <div class="form-group">
+                <label for="editNomePlataforma">Nome da Plataforma:</label>
+                <input type="text" id="editNomePlataforma" required>
+            </div>
+            <div class="form-group">
+                <label for="editTaxaPlataforma">Taxa Percentual (%):</label>
+                <input type="number" id="editTaxaPlataforma" min="0" max="99" step="0.01" required>
+            </div>
+            <button class="btn btn-primary" onclick="salvarEdicaoPlataforma()">
+                <i class="material-icons">save</i> Salvar Alterações
+            </button>
+        </div>
+    </div>
+
+
+    <button id="showNoteButton" onclick="toggleStickyNote()">
+        <i class="material-icons">note_add</i>
+    </button>
+    <div id="stickyNote">
+        <div id="noteHeader">
+            Post-it Digital
+            <button onclick="toggleStickyNote()" title="Ocultar">
+                 <i class="material-icons" style="font-size: 18px; color: var(--text-color);">close</i>
+            </button>
+        </div>
+        <textarea id="noteContent" onkeyup="saveNoteContent()" placeholder="Use para anotações rápidas e lembretes pessoais."></textarea>
+    </div>
+
+
+    <div id="toast">Notificação do Sistema</div>
+
+    <script src="java_completo.js"></script>
+</body>
+</html>
